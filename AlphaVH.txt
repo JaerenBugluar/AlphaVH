@@ -92,7 +92,7 @@ end)
 
 --Fluent provides Lucide Icons https://lucide.dev/icons/ for the tabs, icons are optional
 local Tabs = {
-    Main = Window:AddTab({ Title = "Main", Icon = "bolt" }),
+    Main = Window:AddTab({ Title = "Main", Icon = "shield-check" }),
     Player = Window:AddTab({ Title = "Visuals", Icon = "user" }),
     Misc = Window:AddTab({ Title = "Credits", Icon = "info" })
 }
@@ -196,6 +196,15 @@ Toggle:OnChanged(function()
     }
 
     if Toggle.Value then
+        -- Clear existing highlights
+        for _, highlight in ipairs(highlights) do
+            if highlight and highlight.Parent then
+                highlight:Destroy()
+            end
+        end
+        highlights = {}
+
+        -- Add highlights for existing enemies
         for _, enemy in ipairs(enemies) do
             if enemy then
                 local highlight = Instance.new("Highlight")
@@ -207,6 +216,7 @@ Toggle:OnChanged(function()
             end
         end
     else
+        -- Remove all highlights if toggle is off
         for _, highlight in ipairs(highlights) do
             if highlight and highlight.Parent then
                 highlight:Destroy()
@@ -244,6 +254,11 @@ Tabs.Player:AddButton({
         game.Lighting.Brightness = 50
         game.Lighting.TimeOfDay = 14
     end
+})
+
+Tabs.Misc:AddParagraph({
+    Title = "Creator",
+    Content = "Pixsu"
 })
 
 
