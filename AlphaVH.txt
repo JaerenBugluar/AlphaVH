@@ -1,273 +1,63 @@
+local KeyGuardLibrary = loadstring(game:HttpGet("https://cdn.keyguardian.org/library/v1.0.0.lua"))()
+local trueData = "0aa7c42f267e4903a2026ddb31c4827a"
+local falseData = "ef5c2158a58b40af97bf5476e03b4074"
+
+KeyGuardLibrary.Set({
+  publicToken = "9025447b382d4c929313a3b8589a2238",
+  privateToken = "fa7ddbad09e1418b888c4995f09f813c",
+  trueData = trueData,
+  falseData = falseData,
+})
+
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
-local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local key = ""
 
 local Window = Fluent:CreateWindow({
-    Title = "Virgo Hub : Multiverse ",
-    SubTitle = "by pixsu",
+    Title = "Key System",
+    SubTitle = "VirgoHub",
     TabWidth = 160,
-    Size = UDim2.fromOffset(580, 460),
-    Acrylic = true, -- The blur may be detectable, setting this to false disables blur entirely
+    Size = UDim2.fromOffset(580, 340),
+    Acrylic = false,
     Theme = "Dark",
-    MinimizeKey = Enum.KeyCode.LeftControl -- Used when theres no MinimizeKeybind
+    MinimizeKey = Enum.KeyCode.LeftControl
 })
 
-local Options = Fluent.Options
-
---Toggle UI
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local SoundService = game:GetService("SoundService")
-local TweenService = game:GetService("TweenService")
-
-local soundId = "rbxassetid://130785805" 
-local sound = Instance.new("Sound")
-sound.Name = "ButtonClickSound"
-sound.SoundId = soundId
-sound.Parent = ReplicatedStorage
-
-local MainScreenGui = Instance.new("ScreenGui")
-local ButtonScreenGui = Instance.new("ScreenGui")
-local ImageButton = Instance.new("ImageButton")
-local UICorner = Instance.new("UICorner")
-local UIStroke = Instance.new("UIStroke")
-
-MainScreenGui.Name = "MainScreenGui"
-MainScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-MainScreenGui.ResetOnSpawn = false
-
-ButtonScreenGui.Name = "ButtonScreenGui"
-ButtonScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-ButtonScreenGui.ResetOnSpawn = false
-
-ImageButton.Parent = ButtonScreenGui
-ImageButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-ImageButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
-ImageButton.BorderSizePixel = 0
-ImageButton.Position = UDim2.new(0.5, 10, 0, 10) 
-ImageButton.AnchorPoint = Vector2.new(0.5, 0) 
-ImageButton.Size = UDim2.new(0, 40, 0, 40)
-ImageButton.Image = "rbxassetid://18403614991"
-
-UICorner.CornerRadius = UDim.new(1, 0) 
-UICorner.Parent = ImageButton
-
-UIStroke.Color = Color3.fromRGB(255, 255, 255)
-UIStroke.Parent = ImageButton
-
--- Thêm phần thay đổi màu RGB liên tục cho UIStroke
-local colors = {
-    Color3.fromRGB(255, 255, 255),   -- Đỏ
-    Color3.fromRGB(135, 206, 235),   -- Xanh dương
-}
-
-local index = 1
-
-spawn(function()
-    while true do
-        UIStroke.Color = colors[index]
-        index = index % #colors + 1 
-        wait(0.5) 
-    end
-end)
-
-local function toggleUI()
-    MainScreenGui.Enabled = not MainScreenGui.Enabled
-end
-
-ImageButton.MouseButton1Click:Connect(function()
-    
-    local goal = {Rotation = 360} 
-    local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Back) 
-    local tween = TweenService:Create(ImageButton, tweenInfo, goal)
-
-    tween:Play()
-    tween.Completed:Connect(function()
-        ImageButton.Rotation = 0 
-        toggleUI() 
-    end)
-
-    local clickSound = sound:Clone()
-    clickSound.Parent = SoundService
-    clickSound:Play()
-    
-    game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.LeftControl, false, game)
-end)
-
---Fluent provides Lucide Icons https://lucide.dev/icons/ for the tabs, icons are optional
 local Tabs = {
-    Main = Window:AddTab({ Title = "Main", Icon = "shield-check" }),
-    Player = Window:AddTab({ Title = "Visuals", Icon = "user" }),
-    Misc = Window:AddTab({ Title = "Credits", Icon = "info" })
+    KeySys = Window:AddTab({ Title = "Key System", Icon = "key" }),
 }
 
---Tabs
-local orbPositions = {
-    Vector3.new(-50.023860931396484, 22.763633728027344, -185.96620178222656), -- 1
-    Vector3.new(-62.7463493347168, 22.763633728027344, -255.7347412109375), -- 2
-    Vector3.new(-156.0176239013672, 22.763633728027344, -52.97214126586914), -- 3
-    Vector3.new(-61.52890396118164, 22.763633728027344, -28.90069007873535), -- 4
-    Vector3.new(76.01665496826172, 22.76363182067871, -99.83189392089844), -- 5
-    Vector3.new(113.93673706054688, 22.763633728027344, -93.41536712646484), -- 6
-    Vector3.new(-59.50334930419922, 22.763633728027344, -121.05347442626953), -- 7
-    Vector3.new(41.50461196899414, 22.803634643554688, -296.5406494140625)  -- 8
-}
+local Entkey = Tabs.KeySys:AddInput("Input", {
+    Title = "Enter Key",
+    Description = "Enter Key Here",
+    Default = "",
+    Placeholder = "Enter key…",
+    Numeric = false,
+    Finished = false,
+    Callback = function(Value)
+        key = Value
+    end
+})
 
-Tabs.Main:AddButton({
-    Title = "Auto Complete Part 1 Maze [HIACHI]",
-    Description = "",
+local Checkkey = Tabs.KeySys:AddButton({
+    Title = "Check Key",
+    Description = "Enter Key before pressing this button",
     Callback = function()
-        local player = game.Players.LocalPlayer
-        local character = player.Character or player.CharacterAdded:Wait()
-        local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-
-        -- Iterate through each position
-        for _, position in ipairs(orbPositions) do
-            -- Teleport to the orb's position
-            humanoidRootPart.CFrame = CFrame.new(position)
-
-            -- Wait a brief moment to allow the teleport to complete
-            wait(1.5)
-
-            -- Find the orb at the current position
-            local orbs = workspace.Collections.CollectableItem.ORB:GetChildren()
-            for _, orb in ipairs(orbs) do
-                if orb:IsA("Model") and orb:FindFirstChild("ProximityPrompt") then
-                    local proximityPrompt = orb:FindFirstChild("ProximityPrompt")
-                    
-                    -- Trigger the ProximityPrompt
-                    proximityPrompt:Trigger() -- This directly triggers the ProximityPrompt
-                    break
-                end
-            end
-
-            wait(1.5) -- Delay between each activation
+        local response = KeyGuardLibrary.validateDefaultKey(key)
+        if response == trueData then
+           print("Key is valid")
+           -- Your code here
+        else
+           print("Key is invalid")
         end
     end
 })
 
-Tabs.Main:AddButton({
-    Title = "Auto Complete Part 2 Maze [SHAKU]",
-    Description = "",
+local Getkey = Tabs.KeySys:AddButton({
+    Title = "Get Key",
+    Description = "Get Key here",
     Callback = function()
-        local keyexit = Vector3.new(581.6994018554688, 6.510000228881836, -806.6127319335938)
-        local keydoor = Vector3.new(506.71502685546875, 3.5, -657.1876831054688)
-        local prompty = workspace.WHITE:FindFirstChild("ProximityPrompt")
-
-        local player = game.Players.LocalPlayer
-        local character = player.Character or player.CharacterAdded:Wait()
-        local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-
-        wait(1.5)
-        humanoidRootPart.CFrame = CFrame.new(keyexit)
-        prompty:InputHoldBegin()
-        wait(3.5)
-        prompty:InputHoldEnd()
-        wait(1)
-        humanoidRootPart.CFrame = CFrame.new(keydoor)
-        print("DONE GET SPIRIT")
+       setclipboard(KeyGuardLibrary.getLink())
     end
 })
-
-Tabs.Main:AddButton({
-    Title = "Auto Complete Part 3 Maze [CORRUPTED SHAKU]",
-    Description = "",
-    Callback = function()
-        print("Not Done Yet :')")
-    end
-})
-
-Tabs.Main:AddButton({
-    Title = "Auto Complete Part 4 Maze [MJ]",
-    Description = "",
-    Callback = function()
-        print("Not Done Yet :')")
-    end
-})
-
-
---MiscTab
-
-local Toggle = Tabs.Player:AddToggle("Highlights", {Title = "ESP Monster", Default = false })
-
-local highlights = {}
-
-Toggle:OnChanged(function()
-    local enemies = {
-        workspace.AI.GameAI:FindFirstChild("AI"),
-        workspace.AI.GameAI:FindFirstChild("CORRUPTEDSHAKU"),
-        workspace.AI.GameAI:FindFirstChild("SHAKU"),
-    }
-
-    if Toggle.Value then
-        -- Clear existing highlights
-        for _, highlight in ipairs(highlights) do
-            if highlight and highlight.Parent then
-                highlight:Destroy()
-            end
-        end
-        highlights = {}
-
-        -- Add highlights for existing enemies
-        for _, enemy in ipairs(enemies) do
-            if enemy then
-                local highlight = Instance.new("Highlight")
-                highlight.Adornee = enemy
-                highlight.FillColor = Color3.new(1, 0, 0) -- Red fill
-                highlight.OutlineColor = Color3.new(1, 0, 0) -- White outline
-                highlight.Parent = enemy
-                table.insert(highlights, highlight)
-            end
-        end
-    else
-        -- Remove all highlights if toggle is off
-        for _, highlight in ipairs(highlights) do
-            if highlight and highlight.Parent then
-                highlight:Destroy()
-            end
-        end
-        highlights = {}
-    end
-end)
-
-Options.Highlights:SetValue(false)
-
-
-Tabs.Player:AddButton({
-    Title = "Remove Brightness",
-    Description = "Remove Any Applied Brightness",
-    Callback = function()
-        game.Lighting.Brightness = 1
-        game.Lighting.TimeOfDay = 0
-    end
-})
-
-Tabs.Player:AddButton({
-    Title = "Medium Brightness",
-    Description = "Recommended Brightness",
-    Callback = function()
-        game.Lighting.Brightness = 25
-        game.Lighting.TimeOfDay = 7
-    end
-})
-
-Tabs.Player:AddButton({
-    Title = "Max Brightness",
-    Description = "Ultra Pro Max Brightness",
-    Callback = function()
-        game.Lighting.Brightness = 50
-        game.Lighting.TimeOfDay = 14
-    end
-})
-
-Tabs.Misc:AddParagraph({
-    Title = "Creator",
-    Content = "Pixsu"
-})
-
 
 Window:SelectTab(1)
-
-Fluent:Notify({
-    Title = "Virgo Hub",
-    Content = "The script has been loaded.",
-    Duration = 8
-})
